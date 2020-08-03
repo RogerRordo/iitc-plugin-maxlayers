@@ -2,7 +2,7 @@
 // @author         RogerRordo
 // @name           IITC plugin: Max Layers
 // @category       Layer
-// @version        0.1
+// @version        0.2
 // @description    Calculate Max Layers
 // @run-at         document-end
 // @id             iitc-plugin-maxlayers

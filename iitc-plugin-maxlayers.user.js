@@ -2,7 +2,7 @@
 // @author         RogerRordo
 // @name           IITC plugin: Max Layers
 // @category       Layer
-// @version        0.1
+// @version        0.2
 // @description    Calculate Max Layers
 // @run-at         document-end
 // @id             iitc-plugin-maxlayers
@@ -36,6 +36,7 @@ function wrapper(plugin_info) {
   /*
    * whatsnew
    * v0.1 基本可用。按到双顶点连线距离排序，然后做dp。距离计算是用其中一个点取经度修正值修正所有经度距离，因此高纬度或者长距离可能有问题。时间复杂度O(n^2)。
+   * v0.2 怎么敢说可用的……修复了一个傻逼到不想提的错误……
    */
 
   window.plugin.maxlayers = function () {};
@@ -159,6 +160,7 @@ function wrapper(plugin_info) {
     var portalsList3 = window.plugin.maxlayers.sortDist(portalsList2);
 
     // 计算最大层数
+    maxLayers = 0;
     for (var i = 0; i < portalsList3.length; i++) {
       portalsList3[i].lastPoint = -1;
       portalsList3[i].layersCount = 1;
@@ -170,6 +172,8 @@ function wrapper(plugin_info) {
           //等号为了尽可能取多mu
           portalsList3[i].layersCount = portalsList3[j].layersCount + 1;
           portalsList3[i].lastPoint = j;
+          if (portalsList3[i].layersCount > maxLayers)
+            maxLayers = portalsList3[i].layersCount;
         }
       }
     }
@@ -177,11 +181,13 @@ function wrapper(plugin_info) {
     // 返回计划
     var plans = [];
     var stack = [];
+    var bestLastPoint;
     for (
-      var x = portalsList3.length - 1;
-      x != -1;
-      x = portalsList3[x].lastPoint
-    )
+      bestLastPoint = portalsList3.length - 1;
+      portalsList3[bestLastPoint].layersCount < maxLayers;
+      bestLastPoint--
+    );
+    for (var x = bestLastPoint; x != -1; x = portalsList3[x].lastPoint)
       stack.push(x);
     while (stack.length > 0) plans.push(portalsList3[stack.pop()]);
     return plans;
